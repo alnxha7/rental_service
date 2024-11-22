@@ -1,0 +1,264 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Blockchain &mdash; using rental system</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="Free-Template.co" />
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,900|Oswald:300,400,700" rel="stylesheet">
+
+    <link rel="stylesheet" href="../static/fonts/icomoon/style.css">
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/css/jquery-ui.css">
+    <link rel="stylesheet" href="../static/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="../static/css/owl.theme.default.min.css">
+    <link rel="stylesheet" href="../static/css/owl.theme.default.min.css">
+    <link rel="stylesheet" href="../static/css/jquery.fancybox.min.css">
+    <link rel="stylesheet" href="../static/css/bootstrap-datepicker.css">
+    <link rel="stylesheet" href="../static/fonts/flaticon/font/flaticon.css">
+    <link rel="stylesheet" href="../static/css/aos.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+    <style>
+      table {
+  width: 100%; /* Ensures it stretches to the full width of the container */
+  max-width: 1200px; /* Increases the maximum width */
+  border-collapse: collapse;
+  margin: 30px auto; /* Centers the table and adds more spacing */
+  font-size: 1.1rem; /* Makes the text slightly larger */
+  text-align: left;
+}
+
+/* Adjust Table Header */
+thead th {
+  background-color: #000001;
+  color: white;
+  padding: 16px; /* Increases padding for a larger feel */
+  text-align: center;
+  font-size: 1.2rem; /* Increases font size for headers */
+}
+
+/* Adjust Table Cells */
+td, th {
+  padding: 16px; /* Increases padding */
+  text-align: center;
+  color: #000001;
+}
+
+/* Increase Row Spacing */
+tbody tr {
+  border-bottom: 2px solid #ddd; /* Increases row border thickness */
+}
+
+/* Zebra Striping */
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Add Hover Effect */
+tbody tr:hover {
+  background-color: #eaeaea; /* Slightly darker on hover */
+}
+
+/* Responsive Adjustments */
+@media screen and (max-width: 600px) {
+  table {
+    font-size: 1rem; /* Slightly smaller font for smaller screens */
+  }
+}
+.container {
+  max-width: 1400px; /* Increases the container width */
+  padding: 20px; /* Adds padding to the container for a better layout */
+}
+    </style>
+    
+  </head>
+  <body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
+  
+  <div class="site-wrap">
+
+    <div class="site-mobile-menu site-navbar-target">
+      <div class="site-mobile-menu-header">
+        <div class="site-mobile-menu-close mt-3">
+          <span class="icon-close2 js-menu-toggle"></span>
+        </div>
+      </div>
+      <div class="site-mobile-menu-body"></div>
+    </div>
+   
+    
+    <header class="site-navbar py-4 js-sticky-header site-navbar-target" role="banner">
+
+      <div class="container">
+        <div class="row align-items-center">
+          
+          <div class="col-6 col-xl-2">
+            <h1 class="mb-0 site-logo m-0 p-0"><a href="/" class="mb-0">Welcome______{{ request.user.username }}</a></h1>
+          </div>
+
+          <div class="col-12 col-md-10 d-none d-xl-block">
+            <nav class="site-navigation position-relative text-right" role="navigation">
+
+                <ul class="site-menu main-menu js-clone-nav mr-auto d-none d-lg-block">
+                    <li><a href="{% url 'provider_index' %}" class="nav-link">Home</a></li>
+                    <li><a href="{% url 'add_property' %}" class="nav-link">Add property</a></li>
+                    <li><a href="{% url 'manage_properties' %}" class="nav-link">manage properties</a></li>
+                    <li><a href="{% url 'provider_update' %}" class="nav-link">Update terms</a></li>
+                    <li><a href="{% url 'user_requests' %}" class="nav-link">View Requests</a></li>
+                    <li><a href="{% url 'logout' %}" class="nav-link">logout</a></li>
+                  </ul>
+            </nav>
+          </div>
+
+
+          <div class="col-6 d-inline-block d-xl-none ml-md-0 py-3"><a href="#" class="site-menu-toggle js-menu-toggle text-white float-right"><span class="icon-menu h3"></span></a></div>
+
+        </div>
+      </div>
+      
+    </header>
+
+    
+    <div class="site-block-wrap">
+      <div class="site-blocks-cover overlay overlay-2" style="background-image: url(../static/images/hero_1.jpg);" data-aos="fade" id="home-section">
+
+
+        <div class="container">
+          <div class="row align-items-center justify-content-center">
+            <div class="col-md-6 mt-lg-5 text-center">
+
+                <h2 class="text-white">My Requests</h2>
+          <table class="table table-bordered table-light">
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>Tenant</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Rental Period</th>
+                <th>Property Image</th>
+                <th>Aadhaar</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for requests in user_requests %}
+              <tr>
+                <td>{{ requests.property.title }}</td>
+                <td>{{ requests.tenant.username }}</td>
+                <td>{{ requests.start_date }}</td>
+                <td>{{ requests.end_date }}</td>
+                <td>{{ requests.duration }} - {{ requests.rental_period }}</td>
+                <td>
+                  <img src="{{ requests.property.image.url }}" alt="{{ property.provider.username }}" style="max-width: 100px; cursor: pointer;">
+                </td> 
+                <td>
+                    {% if requests.aadhar %}
+                    <img src="{{ requests.tenant.document.url }}" alt="Aadhaar Document" style="max-width: 100px; cursor: pointer;">
+                    {% else %}
+                    Not Uploaded
+                    {% endif %}
+                </td>    
+                <td>
+                    <form method="post" style="display:inline;" action="{% url 'user_requests' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="requests_id" value="{{ requests.id }}">
+                        <button class="btn btn-success" type="submit" name="action" value="approve">Approve</button>
+                        <button class="btn btn-danger" type="submit" name="action" value="reject">Reject</button>
+                      </form>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5">No Request Available.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+            </div>
+          </div>
+        </div>
+      </div>   
+  </div>      
+   
+    <footer class="site-footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8">
+            <div class="row">
+              <div class="col-md-5">
+                <h2 class="footer-heading mb-4">About Us</h2>
+                <p>the ultimate marketplace for buying, selling, and renting properties. We connect property owners, buyers, and renters in one convenient platform, making real estate transactions simple, safe, and accessible for everyone.</p>
+              </div>
+              <div class="col-md-3 mx-auto">
+                <h2 class="footer-heading mb-4">Quick Links</h2>
+                <ul class="list-unstyled">
+                  <li><a href="#">About Us</a></li>
+                  <li><a href="#">Services</a></li>
+                  <li><a href="#">Testimonials</a></li>
+                  <li><a href="#">Contact Us</a></li>
+                </ul>
+              </div>
+              
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mb-4">
+              <h2 class="footer-heading mb-4">Subscribe Newsletter</h2>
+            <form action="#" method="post" class="footer-subscribe">
+              <div class="input-group mb-3">
+                <input type="text" class="form-control border-secondary text-white bg-transparent" placeholder="Enter Email" aria-label="Enter Email" aria-describedby="button-addon2">
+                <div class="input-group-append">
+                  <button class="btn btn-primary text-black" type="button" id="button-addon2">Send</button>
+                </div>
+              </div>
+            </form>  
+            </div>
+            
+            <div class="">
+              <h2 class="footer-heading mb-4">Follow Us</h2>
+                <a href="#" class="pl-0 pr-3"><span class="icon-facebook"></span></a>
+                <a href="#" class="pl-3 pr-3"><span class="icon-twitter"></span></a>
+                <a href="#" class="pl-3 pr-3"><span class="icon-instagram"></span></a>
+                <a href="#" class="pl-3 pr-3"><span class="icon-linkedin"></span></a>
+            </div>
+
+
+          </div>
+        </div>
+        <div class="row pt-5 mt-5 text-center">
+          <div class="col-md-12">
+            <div class="border-top pt-5">
+            <!-- Link back to Free-Template.co can't be removed. Template is licensed under CC BY 3.0. -->
+            <p class="copyright"><small>&copy; <script>document.write(new Date().getFullYear());</script> Warehouse. All Rights Reserved.</a></small></p>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </footer>
+
+  </div> <!-- .site-wrap -->
+
+  <a href="#top" class="gototop"><span class="icon-angle-double-up"></span></a> 
+
+  <script src="../static/js/jquery-3.3.1.min.js"></script>
+  <script src="../static/js/jquery-ui.js"></script>
+  <script src="../static/js/popper.min.js"></script>
+  <script src="../static/js/bootstrap.min.js"></script>
+  <script src="../static/js/owl.carousel.min.js"></script>
+  <script src="../static/js/jquery.countdown.min.js"></script>
+  <script src="../static/js/bootstrap-datepicker.min.js"></script>
+  <script src="../static/js/jquery.easing.1.3.js"></script>
+  <script src="../static/js/aos.js"></script>
+  <script src="../static/js/jquery.fancybox.min.js"></script>
+  <script src="../static/js/jquery.sticky.js"></script>
+  <script src="../static/js/main.js"></script>
+    
+  </body>
+</html>

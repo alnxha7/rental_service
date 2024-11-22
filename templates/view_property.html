@@ -1,0 +1,312 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Blockchain &mdash; using rental system</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="Free-Template.co" />
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,900|Oswald:300,400,700" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}">
+    <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/jquery.fancybox.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-datepicker.css' %}">
+    <link rel="stylesheet" href="{% static 'fonts/flaticon/font/flaticon.css' %}">
+    <link rel="stylesheet" href="{% static 'css/aos.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+      .success {
+          padding: 10px;
+          margin: 20px 0;
+          border-radius: 5px;
+          animation: fadeOut 5s forwards;
+        }
+        .error {
+          padding: 10px;
+          margin: 20px 0;
+          border-radius: 5px;
+          animation: fadeOut 5s forwards;
+        }
+      
+        @keyframes fadeOut {
+          0% { opacity: 1; }
+          100% { opacity: 0; }
+        }
+     .card-body {
+        background-color: black;
+     }
+/* Responsive Table */
+@media screen and (max-width: 600px) {
+  table {
+    font-size: 0.9rem;
+  }
+}
+
+/* Buttons */
+button {
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+button.btn-success {
+  background-color: #28a745;
+  color: white;
+  border-radius: 5px;
+}
+
+button.btn-success:hover {
+  background-color: #218838;
+}
+
+button.btn-danger {
+  background-color: #dc3545;
+  color: white;
+  border-radius: 5px;
+}
+
+button.btn-danger:hover {
+  background-color: #c82333;
+}
+    </style>
+    
+  </head>
+  <body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
+  
+  <div class="site-wrap">
+
+    <div class="site-mobile-menu site-navbar-target">
+      <div class="site-mobile-menu-header">
+        <div class="site-mobile-menu-close mt-3">
+          <span class="icon-close2 js-menu-toggle"></span>
+        </div>
+      </div>
+      <div class="site-mobile-menu-body"></div>
+    </div>
+   
+    
+    <header class="site-navbar py-4 js-sticky-header site-navbar-target" role="banner">
+
+      <div class="container">
+        <div class="row align-items-center">
+          
+          <div class="col-6 col-xl-2">
+            <h1 class="mb-0 site-logo m-0 p-0"><a href="/" class="mb-0">rental service</a></h1>
+          </div>
+
+          <div class="col-12 col-md-10 d-none d-xl-block">
+            <nav class="site-navigation position-relative text-right" role="navigation">
+
+                <ul class="site-menu main-menu js-clone-nav mr-auto d-none d-lg-block">
+                    <li><a href="{% url 'list_properties' %}" class="nav-link">properties</a></li>
+                  </ul>
+            </nav>
+          </div>
+
+
+          <div class="col-6 d-inline-block d-xl-none ml-md-0 py-3"><a href="#" class="site-menu-toggle js-menu-toggle text-white float-right"><span class="icon-menu h3"></span></a></div>
+
+        </div>
+      </div>
+      
+    </header>
+
+    
+    <div class="site-block-wrap">
+      <div class="site-blocks-cover overlay overlay-2" data-aos="fade" id="home-section">
+
+
+        <div class="container">
+          <div class="row align-items-center justify-content-center">
+            {% if success %}
+              <p style="color: #28a745;" class="error">{{ success }}</p>
+            {% elif error %}
+              <p style="color: red;" class="error"> {{ error }}</p>
+            {% endif %}
+
+            {% if property %}
+      <h2 class="text-white">Property Details</h2>
+      <div class="card mb-3" style="max-width: 100%;">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img src="{{ property.image.url }}" class="img-fluid rounded-start" alt="{{ property.title }}" style="max-width: 100%; height: auto;">
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h5 class="text-white" style="font-size: 2rem;">{{ property.title }}</h5><br><br>
+              <p class="card-text"><strong>Provider:</strong> {{ property.provider.username }}</p>
+              <p class="card-text"><strong>Description:</strong> {{ property.description }}</p>
+              <p class="card-text"><strong>Location:</strong> {{ property.address }}</p>
+              <p class="card-text"><strong>Contact:</strong> {{ property.provider.contact_number }}</p>
+              <p class="card-text" style="font-size: 1.5rem; color: red;">
+                <strong>Rent Amount:</strong> {{ property.rent_amount }} per day
+              </p>
+
+              <form action="{% url 'view_property' property.id %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                  <label for="rental_period">Select Rental Period Type</label>
+                  <select class="form-control" name="rental_period" id="rental_period" required onchange="populateDurationOptions()">
+                    <option value="days">Days</option>
+                    <option value="months">Months</option>
+                    <option value="years">Years</option> <!-- Updated for consistency -->
+                  </select>
+                </div>
+              
+                <div class="form-group">
+                  <label for="duration">Select Duration</label>
+                  <select class="form-control" name="duration" id="duration" required>
+                    <!-- Options populated by JavaScript -->
+                  </select>
+                </div>
+              
+                <div class="form-group">
+                  <label for="start_date">Select your START DATE</label>
+                  <input type="date" class="form-control" name="start_date" id="start_date" min="{{ today_date }}" required>
+                </div>
+              
+                <div class="form-group">
+                  <label for="aadhar">Your Aadhar Will Also Be Submitted Automatically</label>
+                  {% if tenant.document %}
+                    <p id="aadhar">
+                      <a href="{{ tenant.document.url }}" target="_blank">View Document</a>
+                    </p>
+                    <input type="hidden" name="aadhar" value="{{ tenant.document.url }}">
+                  {% else %}
+                    <p id="aadhar">No document uploaded</p>
+                  {% endif %}
+                </div>
+              
+                <button class="btn btn-success">Request</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+      <h2 class="text-center">No property selected</h2>
+    </div>
+    {% endif %}
+      </div>   
+  </div>      
+   
+    <footer class="site-footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8">
+            <div class="row">
+              <div class="col-md-5">
+                <h2 class="footer-heading mb-4">About Us</h2>
+                <p>the ultimate marketplace for buying, selling, and renting properties. We connect property owners, buyers, and renters in one convenient platform, making real estate transactions simple, safe, and accessible for everyone.</p>
+              </div>
+              <div class="col-md-3 mx-auto">
+                <h2 class="footer-heading mb-4">Quick Links</h2>
+                <ul class="list-unstyled">
+                  <li><a href="#">About Us</a></li>
+                  <li><a href="#">Services</a></li>
+                  <li><a href="#">Testimonials</a></li>
+                  <li><a href="#">Contact Us</a></li>
+                </ul>
+              </div>
+              
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mb-4">
+              <h2 class="footer-heading mb-4">Subscribe Newsletter</h2>
+            <form action="#" method="post" class="footer-subscribe">
+              <div class="input-group mb-3">
+                <input type="text" class="form-control border-secondary text-white bg-transparent" placeholder="Enter Email" aria-label="Enter Email" aria-describedby="button-addon2">
+                <div class="input-group-append">
+                  <button class="btn btn-primary text-black" type="button" id="button-addon2">Send</button>
+                </div>
+              </div>
+            </form>  
+            </div>
+            
+            <div class="">
+              <h2 class="footer-heading mb-4">Follow Us</h2>
+                <a href="#" class="pl-0 pr-3"><span class="icon-facebook"></span></a>
+                <a href="#" class="pl-3 pr-3"><span class="icon-twitter"></span></a>
+                <a href="#" class="pl-3 pr-3"><span class="icon-instagram"></span></a>
+                <a href="#" class="pl-3 pr-3"><span class="icon-linkedin"></span></a>
+            </div>
+
+
+          </div>
+        </div>
+        <div class="row pt-5 mt-5 text-center">
+          <div class="col-md-12">
+            <div class="border-top pt-5">
+            <!-- Link back to Free-Template.co can't be removed. Template is licensed under CC BY 3.0. -->
+            <p class="copyright"><small>&copy; <script>document.write(new Date().getFullYear());</script> Warehouse. All Rights Reserved.</a></small></p>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </footer>
+
+  </div> <!-- .site-wrap -->
+
+  <a href="#top" class="gototop"><span class="icon-angle-double-up"></span></a> 
+
+  <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+  <script src="{% static 'js/jquery-ui.js' %}"></script>
+  <script src="{% static 'js/popper.min.js' %}"></script>
+  <script src="{% static 'js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'js/owl.carousel.min.js' %}"></script>
+  <script src="{% static 'js/jquery.countdown.min.js' %}"></script>
+  <script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
+  <script src="{% static 'js/jquery.easing.1.3.js' %}"></script>
+  <script src="{% static 'js/aos.js' %}"></script>
+  <script src="{% static 'js/jquery.fancybox.min.js' %}"></script>
+  <script src="{% static 'js/jquery.sticky.js' %}"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+  <script>
+    // Function to populate duration dropdown options based on rental period
+    function populateDurationOptions() {
+        const rentalPeriod = document.getElementById("rental_period").value;
+        const durationDropdown = document.getElementById("duration");
+
+        // Clear existing options
+        durationDropdown.innerHTML = "";
+
+        // Determine max value based on rental period
+        let maxDuration;
+        if (rentalPeriod === "days") {
+            maxDuration = 30; // Up to 30 days
+        } else if (rentalPeriod === "months") {
+            maxDuration = 12; // Up to 12 months
+        } else if (rentalPeriod === "years") {
+            maxDuration = 5; // Up to 5 years
+        }
+
+        // Populate the dropdown
+        for (let i = 1; i <= maxDuration; i++) {
+            const option = document.createElement("option");
+            option.value = i;
+            option.text = i;
+            durationDropdown.add(option);
+        }
+    }
+
+    // Initialize the dropdown on page load
+    document.addEventListener("DOMContentLoaded", populateDurationOptions);
+</script>
+    
+  </body>
+</html>
