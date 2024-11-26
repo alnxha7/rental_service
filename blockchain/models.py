@@ -32,7 +32,7 @@ class Property(models.Model):
     
 class Terms(models.Model):
     provider = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'provider'})
-    terms = models.FileField(upload_to='terms/')
+    terms = models.TextField()
     
 class UserRequest(models.Model):
     RENTAL_PERIOD_CHOICES = [
@@ -49,6 +49,7 @@ class UserRequest(models.Model):
     duration = models.PositiveIntegerField()  # The number of days, months, or years
     aadhar = models.ImageField(upload_to='request_aadhar/')
     is_approved = models.BooleanField(default=False)
+    monthly_rent = models.BooleanField(default=False)
 
     def calculate_end_date(self):
         """
@@ -74,7 +75,7 @@ class RentalAgreement(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
     deposit_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    terms = models.FileField(upload_to='rental_terms')  
+    terms = models.TextField()  
     is_active = models.BooleanField(default=True)  
 
     def __str__(self):
@@ -90,4 +91,12 @@ class Payment(models.Model):
     def __str__(self):
         return f"Payment for {self.agreement.property.title} on {self.due_date}"
 
+
+class MonthlyPayment(models.Model):
+    request = models.ForeignKey(UserRequest, on_delete=models.CASCADE)
+    tenant = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'tenant'})
+    property = models.ForeignKey(Property, on_delete=models.CASCADE)
+    due_date = models.DateField()
+    amount = models.DecimalField(decimal_places=2, max_digits=10, default=0.00)
+    is_paid = models.BooleanField(default=False)
 

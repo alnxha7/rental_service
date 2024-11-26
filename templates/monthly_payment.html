@@ -24,84 +24,57 @@
     <link rel="stylesheet" href="../static/css/aos.css">
     <link rel="stylesheet" href="../static/css/style.css">
     <style>
-        table {
-    width: 100%;
-    max-width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-    font-size: 1rem;
-    text-align: left;
+      table {
+  width: 100%; /* Ensures it stretches to the full width of the container */
+  max-width: 1200px; /* Increases the maximum width */
+  border-collapse: collapse;
+  margin: 30px auto; /* Centers the table and adds more spacing */
+  font-size: 1.1rem; /* Makes the text slightly larger */
+  text-align: left;
+}
+
+/* Adjust Table Header */
+thead th {
+  background-color: #000001;
+  color: white;
+  padding: 16px; /* Increases padding for a larger feel */
+  text-align: center;
+  font-size: 1.2rem; /* Increases font size for headers */
+}
+
+/* Adjust Table Cells */
+td, th {
+  padding: 16px; /* Increases padding */
+  text-align: center;
+  color: #000001;
+}
+
+/* Increase Row Spacing */
+tbody tr {
+  border-bottom: 2px solid #ddd; /* Increases row border thickness */
+}
+
+/* Zebra Striping */
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Add Hover Effect */
+tbody tr:hover {
+  background-color: #eaeaea; /* Slightly darker on hover */
+}
+
+/* Responsive Adjustments */
+@media screen and (max-width: 600px) {
+  table {
+    font-size: 1rem; /* Slightly smaller font for smaller screens */
   }
-  
-  .site-blocks-cover .container {
-    max-width: 100%; /* Ensure the container doesn't limit the table */
-  }
-  
-  /* Table Header */
-  thead th {
-    background-color: #000001;
-    color: white;
-    padding: 12px;
-    text-align: center;
-  }
-  
-  /* Table Rows */
-  tbody tr {
-    border-bottom: 1px solid #ddd;
-  }
-  
-  /* Table Cells */
-  td, th {
-    padding: 12px;
-    text-align: center;
-    color: #000001;
-  }
-  
-  /* Zebra Stripes for Rows */
-  tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-  
-  /* Highlight Row on Hover */
-  tbody tr:hover {
-    background-color: #f1f1f1;
-  }
-  
-  /* Responsive Table */
-  @media screen and (max-width: 600px) {
-    table {
-      font-size: 0.9rem;
-    }
-  }
-  
-  /* Buttons */
-  button {
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
-    font-size: 1rem;
-  }
-  
-  button.btn-success {
-    background-color: #28a745;
-    color: white;
-    border-radius: 5px;
-  }
-  
-  button.btn-success:hover {
-    background-color: #218838;
-  }
-  
-  button.btn-danger {
-    background-color: #dc3545;
-    color: white;
-    border-radius: 5px;
-  }
-  
-  button.btn-danger:hover {
-    background-color: #c82333;
-  }
-      </style>
+}
+.container {
+  max-width: 1400px; /* Increases the container width */
+  padding: 20px; /* Adds padding to the container for a better layout */
+}
+    </style>
     
   </head>
   <body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
@@ -131,12 +104,11 @@
             <nav class="site-navigation position-relative text-right" role="navigation">
 
                 <ul class="site-menu main-menu js-clone-nav mr-auto d-none d-lg-block">
-                    <li><a href="{% url 'provider_index' %}" class="nav-link">Home</a></li>
-                    <li><a href="{% url 'add_property' %}" class="nav-link">Add property</a></li>
-                    <li><a href="{% url 'manage_properties' %}" class="nav-link">manage properties</a></li>
-                    <li><a href="{% url 'provider_update' %}" class="nav-link">Update terms</a></li>
-                    <li><a href="{% url 'user_requests' %}" class="nav-link">View Requests</a></li>
-                    <li><a href="{% url 'logout' %}" class="nav-link">logout</a></li>
+                  <li><a href="{% url 'tenant_index' %}" class="nav-link">Home</a></li>
+                  <li><a href="{% url 'list_properties' %}" class="nav-link">Properties</a></li>
+                  <li><a href="{% url 'tenant_requests' %}" class="nav-link">My Requests</a></li>
+                  <li><a href="{% url 'payment_requests' %}" class="nav-link">Payment Requests</a></li>
+                  <li><a href="{% url 'logout' %}" class="nav-link">logout</a></li>
                   </ul>
             </nav>
           </div>
@@ -158,23 +130,59 @@
           <div class="row align-items-center justify-content-center">
             <div class="col-md-6 mt-lg-5 text-center">
 
-                <h2 class="text-white">Terms</h2>
-                  <form action="{% url 'provider_update' %}" method="post" class="p-5 bg-light border rounded" enctype="multipart/form-data">
-                    {% if success %}
-                        <p class="error" style="color: #28a745;">{{ success }}</p>
+                <h2 class="text-white">Monthly payment Request</h2>
+          <table class="table table-bordered table-light">
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>Provider</th>
+                <th>Property Image</th>
+                <th>Date Purchased</th>
+                <th>Due Date</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for request in requests %}
+              <tr>
+                <td>{{ request.property.title }}</td>
+                <td>{{ request.property.provider.username }}</td>
+                <td>
+                  <img src="{{ request.property.image.url }}" alt="{{ property.provider.username }}" style="max-width: 100px; cursor: pointer;">
+                </td>  
+                <td>{{ request.request.start_date }}</td>
+                <td>{{ request.due_date }}</td>  
+                <td>{{ request.amount }}</td>
+                <td>
+                    {% if request.is_paid == False %}
+                        <span style="color: red;">Pending</span>
+                    {% else %}
+                        <span style="color: green;">Paid</span>
                     {% endif %}
-                    {% csrf_token %}
-                    <div class="form-group">
-                        {% if term.terms %}
-                            Current Terms: 
-                            <p style="color: #000001;">{{ term.terms }}</p><br><br><br>
-                        {% endif %}
-                        <label for="terms">Upload Your Terms</label>
-                        <input type="text" name="terms" id="terms" class="form-control" placeholder="Enter you terms and conditions">
-                      </div>
+                </td>  
+                <td>
+                    {% if not request.is_paid %}
+                    <form method="post" style="display:inline;" action="{% url 'monthly_payment' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="request_id" value="{{ request.id }}">
+                        <button class="btn btn-success" type="submit" name="action" value="pay">Pay Now</button>
+                        <button class="btn btn-danger" type="submit" name="action" value="cancel">Cancel</button>
+                    </form>
 
-                    <button type="submit" class="btn btn-primary btn-block">Submit</button>
-                  </form>
+                    {% else %}
+                        <span class="btn btn-warning">No Action</span>
+                {% endif %}
+              </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5">No Request Available.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
 
             </div>
           </div>
@@ -258,4 +266,3 @@
     
   </body>
 </html>
-

@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout, login, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from .models import User, Property, Terms, RentalAgreement, UserRequest, Payment
+from .models import User, Property, Terms, RentalAgreement, UserRequest, Payment, MonthlyPayment
 from datetime import date
 from decimal import Decimal
 from datetime import date, datetime
@@ -228,6 +228,54 @@ def view_properties(request, property_id):
             end_date = start_date + timedelta(days=duration)
         elif rental_period == "months":
             end_date = start_date + relativedelta(months=duration)
+
+            month_existing_request = UserRequest.objects.filter(
+                tenant=tenant,
+                property=property,
+                start_date=start_date,
+                end_date=end_date,
+                is_approved=False
+            ).exists()
+
+            if month_existing_request:
+                error = 'A similar request already exists.'
+                return render(request, 'view_property.html', {
+                    'property': property,
+                    'today_date': today_date,
+                    'error': error,
+                    'tenant': tenant
+                })
+
+            # Create a UserRequest entry
+            monthly_request = UserRequest.objects.create(
+                tenant=request.user,
+                property=property,
+                rental_period=rental_period,
+                start_date=start_date,
+                duration=duration,
+                end_date=end_date,
+                aadhar=aadhar,
+                is_approved=False,
+                monthly_rent=True
+            )
+
+            monthly_amount = property.rent_amount * 30
+
+            # Create multiple MonthlyPayment entries
+            for i in range(duration):
+                due_date = start_date + relativedelta(months=i)  # Increment by month
+                MonthlyPayment.objects.create(
+                    request=monthly_request,
+                    tenant=request.user,
+                    property=property,
+                    due_date=due_date,
+                    amount=monthly_amount,
+                    is_paid=False
+                )
+
+            return redirect('tenant_index')
+        
+        
         elif rental_period == "years":
             end_date = start_date + relativedelta(years=duration)
         
@@ -251,6 +299,7 @@ def view_properties(request, property_id):
                                    end_date = end_date,
                                    aadhar = aadhar,
                                    is_approved = False)
+            
             return redirect('tenant_index')
             
 
@@ -266,7 +315,7 @@ def provider_update(request):
         term = None
 
     if request.method == "POST":
-        terms_content = request.FILES.get('terms')
+        terms_content = request.POST.get('terms')
         if term:
             # Update existing terms
             term.terms = terms_content
@@ -305,17 +354,17 @@ def user_requests(request):
 
 @login_required
 def payment_requests(request):
-    requests = UserRequest.objects.filter(tenant=request.user, is_approved=True)
+    user_requests = UserRequest.objects.filter(tenant=request.user, is_approved=True, monthly_rent=False)
     if request.method == 'POST':
         request_id = request.POST.get('request_id')
         action = request.POST.get('action')
-        request = get_object_or_404(UserRequest, id=request_id)
+        user_request = get_object_or_404(UserRequest, id=request_id)
 
         if action == 'pay_deposit':
-            return redirect('deposit_form', request_id = request.id)
+            return redirect('deposit_form', request_id = user_request.id)
         elif action == 'cancel':
-            request.delete()
-    return render(request, 'payment_requests.html', {'requests': requests})
+            user_request.delete()
+    return render(request, 'payment_requests.html', {'requests': user_requests})
 
 @login_required
 def deposit_form(request, request_id):
@@ -376,3 +425,29 @@ def deposit_form(request, request_id):
 
 def payment_success(request):
     return render(request, 'payment_success.html')
+
+def monthly_payment(request):
+    requests = MonthlyPayment.objects.filter(tenant=request.user)
+
+    if request.method == 'POST':
+        request_id = request.POST.get('request_id')
+        action = request.POST.get('action')
+        user_request = get_object_or_404(MonthlyPayment,id=request_id)
+
+        if action == 'pay':
+            return redirect('pay_monthly', request_id=user_request.id)
+        if action == 'cancel':
+            user_request.delete()
+
+    return render(request, 'monthly_payment.html', {'requests': requests})
+
+def pay_monthly(request, request_id):
+    user_request = get_object_or_404(MonthlyPayment,id=request_id)
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'pay':
+            user_request.is_paid = True
+            user_request.save()
+            return redirect('payment_success')
+    return render(request, 'pay_monthly.html', { 'user_request': user_request })

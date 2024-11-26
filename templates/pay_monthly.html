@@ -64,18 +64,7 @@
 </head>
 <body>
     <div class="container">
-        <div class="terms">
-            <h1>View Provider's Terms --- {{ terms.provider.username}}</h1>
-            {% if terms %}
-                <p> 
-                        {{ terms.terms }} <br><br><br>
-                    </a>
-                </p>
-            {% else %}
-                <p>No terms available for this provider.</p>
-            {% endif %}
-        </div>
-        <h1>Deposit Amount: {{ deposit_amount }}</h1>
+        <h1>Amount: {{ user_request.amount }} </h1>
 <form method="post">
     {% csrf_token %}
     <label for="card_number">Card Number:</label>
@@ -84,7 +73,7 @@
     <label for="cvv">CVV:</label>
     <input type="password" id="cvv" name="cvv" maxlength="3" required>
 
-    <button class="submit-btn" name="action" value="pay" type="submit">Pay Deposit</button>
+    <button class="submit-btn" name="action" value="pay" type="submit">Pay</button>
 </form>
 
     </div>
