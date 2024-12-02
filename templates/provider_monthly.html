@@ -139,11 +139,9 @@ tbody tr:hover {
               <tr>
                 <th>Property</th>
                 <th>Tenant</th>
-                <th>Start Date</th>
-                <th>End Date</th>
                 <th>Rental Period</th>
+                <th>Due Date</th>
                 <th>Property Image</th>
-                <th>Aadhaar</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -152,26 +150,17 @@ tbody tr:hover {
               <tr>
                 <td>{{ requests.property.title }}</td>
                 <td>{{ requests.tenant.username }}</td>
-                <td>{{ requests.start_date }}</td>
-                <td>{{ requests.end_date }}</td>
-                <td>{{ requests.duration }} - {{ requests.rental_period }}</td>
+                <td>{{ requests.request.duration }} - {{ requests.request.rental_period }}</td>
+                <td>{{ requests.due_date }}</td>
                 <td>
                   <img src="{{ requests.property.image.url }}" alt="{{ property.provider.username }}" style="max-width: 100px; cursor: pointer;">
                 </td> 
                 <td>
-                    {% if requests.aadhar %}
-                    <img src="{{ requests.tenant.document.url }}" alt="Aadhaar Document" style="max-width: 100px; cursor: pointer;">
+                    {% if requests.is_paid %}
+                      <span style="color: green;">PAID</span>
                     {% else %}
-                    Not Uploaded
+                      <span style="color: red;">NOT PAID</span>
                     {% endif %}
-                </td>    
-                <td>
-                    <form method="post" style="display:inline;" action="{% url 'user_requests' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="requests_id" value="{{ requests.id }}">
-                        <button class="btn btn-success" type="submit" name="action" value="approve">Approve</button>
-                        <button class="btn btn-danger" type="submit" name="action" value="reject">Reject</button>
-                      </form>
                 </td>
               </tr>
               {% empty %}

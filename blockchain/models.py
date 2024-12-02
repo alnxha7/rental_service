@@ -50,6 +50,7 @@ class UserRequest(models.Model):
     aadhar = models.ImageField(upload_to='request_aadhar/')
     is_approved = models.BooleanField(default=False)
     monthly_rent = models.BooleanField(default=False)
+    loan = models.BooleanField(default=False)
 
     def calculate_end_date(self):
         """
@@ -100,3 +101,10 @@ class MonthlyPayment(models.Model):
     amount = models.DecimalField(decimal_places=2, max_digits=10, default=0.00)
     is_paid = models.BooleanField(default=False)
 
+class LoanPay(models.Model):
+    request = models.ForeignKey(UserRequest, on_delete=models.CASCADE)
+    tenant = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'tenant'})
+    property = models.ForeignKey(Property, on_delete=models.CASCADE)
+    due_date = models.DateField()
+    amount = models.DecimalField(decimal_places=2, max_digits=10, default=0.00)
+    is_paid = models.BooleanField(default=False)

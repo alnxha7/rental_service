@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout, login, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from .models import User, Property, Terms, RentalAgreement, UserRequest, Payment, MonthlyPayment
+from .models import User, Property, Terms, RentalAgreement, UserRequest, Payment, MonthlyPayment, LoanPay
 from datetime import date
 from decimal import Decimal
 from datetime import date, datetime
@@ -278,7 +278,46 @@ def view_properties(request, property_id):
         
         elif rental_period == "years":
             end_date = start_date + relativedelta(years=duration)
+
+            year_request = UserRequest.objects.filter(
+            tenant=tenant,
+            property=property,
+            start_date=start_date,
+            end_date=end_date,
+            is_approved=False
+            ).exists()
         
+            if year_request:
+                error = 'Similar Request already exists'
+                return render(request, 'view_property.html', {'property': property, 'today_date': today_date, 'error': error, 'tenant': tenant})
+            else:
+                loan = UserRequest.objects.create(tenant = request.user, 
+                                   property = property, 
+                                   rental_period=rental_period,
+                                   start_date = start_date,
+                                   duration = duration,
+                                   end_date = end_date,
+                                   aadhar = aadhar,
+                                   is_approved = False,
+                                   loan=True)
+                
+                loan_amount = property.rent_amount * 30 * 12
+
+                try:
+                    loan_pay = LoanPay.objects.create(
+                    request=loan,
+                    tenant=request.user,
+                    property=property,
+                    due_date=end_date,
+                    amount=loan_amount,
+                    is_paid=False
+                    )
+                    print(f"LoanPay created successfully: {loan_pay}")
+                except Exception as e:
+                     print(f"Error creating LoanPay: {e}")
+            
+                return redirect('tenant_index')
+
         existing_request = UserRequest.objects.filter(
             tenant=tenant,
             property=property,
@@ -332,7 +371,7 @@ def provider_update(request):
 
 @login_required
 def tenant_requests(request):
-    user_requests = UserRequest.objects.filter(tenant=request.user)
+    user_requests = UserRequest.objects.filter(tenant=request.user, monthly_rent=False)
     return render(request, 'tenant_requests.html', {'user_requests': user_requests})
 
 @login_required
@@ -371,12 +410,17 @@ def deposit_form(request, request_id):
 
     user_request_instance = get_object_or_404(UserRequest, id=request_id)
     property_obj = user_request_instance.property
+
     try:
         terms = Terms.objects.get(provider=property_obj.provider)
     except Terms.DoesNotExist:
         terms = None
-        
-    deposit_amount = property_obj.rent_amount * Decimal('0.3')
+     
+    if user_request_instance.loan:  # If it's a loan
+        deposit_amount = property_obj.rent_amount * Decimal(30) * Decimal(12)
+    else:  # Normal calculation
+        deposit_amount = property_obj.rent_amount * Decimal('0.3')
+
 
     start_date = user_request_instance.start_date
     end_date = user_request_instance.end_date
@@ -404,17 +448,26 @@ def deposit_form(request, request_id):
             )
             agreement.save()
 
-            Payment.objects.create(
-                agreement=agreement,
-                amount=amount,
-                due_date=end_date,
-                payment_date=date.today(),
-                status='Pending'
-            )
+            if not user_request_instance.loan:
 
-            user_request_instance.delete()
+                Payment.objects.create(
+                    agreement=agreement,
+                    amount=amount,
+                    due_date=end_date,
+                    payment_date=date.today(),
+                    status='Pending'
+                 )
 
-        return redirect('payment_success') 
+                user_request_instance.delete()
+
+                return redirect('payment_success') 
+            
+            else:
+                loan = get_object_or_404(LoanPay, request=user_request_instance)
+                loan.is_paid=True
+                loan.save()
+                return redirect('payment_success') 
+        
 
     return render(request, 'deposit_form.html', {
         'user_request': user_request_instance,
@@ -451,3 +504,13 @@ def pay_monthly(request, request_id):
             user_request.save()
             return redirect('payment_success')
     return render(request, 'pay_monthly.html', { 'user_request': user_request })
+
+def provider_monthly(request):
+    provider_properties = Property.objects.filter(provider=request.user)
+    user_requests = MonthlyPayment.objects.filter(property__in=provider_properties)
+    return render(request, 'provider_monthly.html', {'user_requests': user_requests})
+
+def provider_loan(request):
+    provider_properties = Property.objects.filter(provider=request.user)
+    user_requests = LoanPay.objects.filter(property__in=provider_properties)
+    return render(request, 'provider_loan.html', {'user_requests': user_requests})
