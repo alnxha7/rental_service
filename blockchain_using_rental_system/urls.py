@@ -51,6 +51,8 @@ urlpatterns = [
 
     path('provider_monthly/', views.provider_monthly, name='provider_monthly'),
     path('provider_loan/', views.provider_loan, name='provider_loan'),
+    path('monthly_requests/', views.monthly_request, name='monthly_requests'),
+    path('loan_requests/', views.loan_requests, name='loan_requests'),
 
 ]
 

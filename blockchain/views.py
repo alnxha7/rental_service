@@ -393,7 +393,7 @@ def user_requests(request):
 
 @login_required
 def payment_requests(request):
-    user_requests = UserRequest.objects.filter(tenant=request.user, is_approved=True, monthly_rent=False)
+    user_requests = UserRequest.objects.filter(tenant=request.user, is_approved=True, monthly_rent=False, loan=False)
     if request.method == 'POST':
         request_id = request.POST.get('request_id')
         action = request.POST.get('action')
@@ -460,13 +460,30 @@ def deposit_form(request, request_id):
 
                 user_request_instance.delete()
 
-                return redirect('payment_success') 
+                reciept = {
+                    'tenant_name': request.user.username,
+                    'provider_name': property_obj.provider.username,
+                    'property': property_obj.title,
+                    'amount': amount,
+                    'end_date': end_date,
+                    'payment_date': date.today()
+                }
+
+                return render(request, 'payment_success.html', reciept) 
             
             else:
                 loan = get_object_or_404(LoanPay, request=user_request_instance)
                 loan.is_paid=True
                 loan.save()
-                return redirect('payment_success') 
+                reciept = {
+                    'tenant_name': request.user.username,
+                    'provider_name': property_obj.provider.username,
+                    'property': property_obj.title,
+                    'amount': amount,
+                    'end_date': end_date,
+                    'payment_date': date.today()
+                }
+                return render(request, 'payment_success.html', reciept) 
         
 
     return render(request, 'deposit_form.html', {
@@ -514,3 +531,29 @@ def provider_loan(request):
     provider_properties = Property.objects.filter(provider=request.user)
     user_requests = LoanPay.objects.filter(property__in=provider_properties)
     return render(request, 'provider_loan.html', {'user_requests': user_requests})
+
+def monthly_request(request):
+    user_requests = UserRequest.objects.filter(tenant=request.user, is_approved=True, monthly_rent=True)
+    if request.method == 'POST':
+        request_id = request.POST.get('request_id')
+        action = request.POST.get('action')
+        user_request = get_object_or_404(UserRequest, id=request_id)
+
+        if action == 'pay_deposit':
+            return redirect('deposit_form', request_id = user_request.id)
+        elif action == 'cancel':
+            user_request.delete()
+    return render(request, 'monthly_request.html', {'user_requests': user_requests})
+
+def loan_requests(request):
+    user_requests = UserRequest.objects.filter(tenant=request.user, is_approved=True, loan=True)
+    if request.method == 'POST':
+        request_id = request.POST.get('request_id')
+        action = request.POST.get('action')
+        user_request = get_object_or_404(UserRequest, id=request_id)
+
+        if action == 'pay_deposit':
+            return redirect('deposit_form', request_id = user_request.id)
+        elif action == 'cancel':
+            user_request.delete()
+    return render(request, 'loan_requests.html', {'user_requests': user_requests})

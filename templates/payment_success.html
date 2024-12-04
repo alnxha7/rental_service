@@ -5,47 +5,104 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Success</title>
     <style>
-        /* Styling for success message */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+
         .container {
-            width: 50%;
-            margin: 0 auto;
+            max-width: 600px;
+            margin: 50px auto;
             padding: 20px;
-            background-color: #d4edda;
+            background-color: #ffffff;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .success-header {
             text-align: center;
+            margin-bottom: 20px;
         }
+
         h1 {
-            font-size: 28px;
-            color: #155724;
+            font-size: 32px;
+            color: #28a745;
+            margin-bottom: 10px;
         }
+
         p {
-            font-size: 18px;
-            color: #3c763d;
+            font-size: 16px;
+            margin-bottom: 10px;
         }
+
+        .receipt-details {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f1f8f4;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+        }
+
+        .receipt-details p {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
         .button {
             background-color: #28a745;
             color: white;
-            border: none;
             padding: 10px 20px;
             font-size: 16px;
             text-decoration: none;
             border-radius: 4px;
             cursor: pointer;
-            margin-top: 20px;
+            border: none;
+            margin: 10px;
         }
+
         .button:hover {
             background-color: #218838;
+        }
+
+        .print-button {
+            background-color: #007bff;
+        }
+
+        .print-button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Payment Successful!</h1>
-        <p>Your payment has been successfully processed. Thank you for your transaction!</p>
+        <div class="success-header">
+            <h1>Payment Successful!</h1>
+            <p>Your payment has been successfully processed. Thank you for your transaction!</p>
+        </div>
 
-        <a href="{% url 'tenant_index' %}" class="button">Go Back to Home</a>
+        <div class="receipt-details">
+            <h2>Receipt Details</h2>
+            <p><strong>Name:</strong> {{ tenant_name }}</p>
+            <p><strong>Provider:</strong> {{ provider_name }}</p>
+            <p><strong>Property:</strong>{{ property }}</p>
+            <p><strong>Amount Total:</strong> ₹{{ amount }}</p>
+            <p><strong>End Date:</strong> {{ end_date }}</p>
+            <p><strong>Payment Date:</strong> {{ payment_date }}</p>
+        </div>
+
+        <div class="button-container">
+            <a href="{% url 'tenant_index' %}" class="button">Go Back to Home</a>
+            <button class="button print-button" onclick="window.print()">Print Receipt</button>
+        </div>
     </div>
 
 </body>

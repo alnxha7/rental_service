@@ -79,10 +79,10 @@
 <form method="post">
     {% csrf_token %}
     <label for="card_number">Card Number:</label>
-    <input type="text" id="card_number" name="card_number" maxlength="16" required>
+    <input type="text" id="card_number" name="card_number" maxlength="16" oninput="validateNumberInput(event, 16)" required>
 
     <label for="cvv">CVV:</label>
-    <input type="password" id="cvv" name="cvv" maxlength="3" required>
+    <input type="password" id="cvv" name="cvv" maxlength="3" oninput="validateNumberInput(event, 3)" required>
 
     <button class="submit-btn" name="action" value="pay" type="submit">Pay Deposit</button>
 </form>
