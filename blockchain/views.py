@@ -620,3 +620,11 @@ def maintenance_status(request):
     tenant = request.user
     reports = MaintenanceRequest.objects.filter(agreement__tenant=tenant)
     return render(request, 'maintenance_status.html', {'reports': reports})
+
+def tenant_history(request):
+    histories = RentalAgreement.objects.filter(tenant=request.user)
+    return render(request, 'tenant_history.html', {'histories': histories})
+
+def provider_history(request):
+    histories = RentalAgreement.objects.filter(property__provider=request.user)
+    return render(request, 'provider_history.html', {'histories': histories})

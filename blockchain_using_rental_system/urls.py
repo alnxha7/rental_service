@@ -57,6 +57,8 @@ urlpatterns = [
     path('tenant_maintenance/', views.tenant_maintenance, name='tenant_maintenance'),
     path('provider_maintenance/', views.provider_maintenance, name='provider_maintenance'),
     path('maintenance_status/', views.maintenance_status, name='maintenance_status'),
+    path('tenant_history/', views.tenant_history, name='tenant_history'),
+    path('provider_history/', views.provider_history, name='provider_history'),
 
 ]
 
