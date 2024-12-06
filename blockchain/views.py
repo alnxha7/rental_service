@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout, login, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from .models import User, Property, Terms, RentalAgreement, UserRequest, Payment, MonthlyPayment, LoanPay
+from .models import User, Property, Terms, RentalAgreement, UserRequest, Payment, MonthlyPayment, LoanPay, MaintenanceRequest
 from datetime import date
 from decimal import Decimal
 from datetime import date, datetime
@@ -472,6 +472,9 @@ def deposit_form(request, request_id):
                 return render(request, 'payment_success.html', reciept) 
             
             else:
+                user_request_instance.loan_paid=True
+                user_request_instance.save()
+
                 loan = get_object_or_404(LoanPay, request=user_request_instance)
                 loan.is_paid=True
                 loan.save()
@@ -515,10 +518,23 @@ def pay_monthly(request, request_id):
     user_request = get_object_or_404(MonthlyPayment,id=request_id)
     if request.method == 'POST':
         action = request.POST.get('action')
+        start_date = user_request.request.start_date
+        end_date = user_request.request.end_date
+        deposit_amount = user_request.amount
+        property = user_request.property
+        tenant = request.user
+        provider = user_request.property.provider
+        terms = get_object_or_404(Terms, provider=provider)
 
         if action == 'pay':
             user_request.is_paid = True
             user_request.save()
+            RentalAgreement.objects.create(tenant=tenant,
+                                           property=property,
+                                           start_date=start_date,
+                                           end_date=end_date,
+                                           deposit_amount=deposit_amount,
+                                           terms=terms)
             return redirect('payment_success')
     return render(request, 'pay_monthly.html', { 'user_request': user_request })
 
@@ -546,7 +562,7 @@ def monthly_request(request):
     return render(request, 'monthly_request.html', {'user_requests': user_requests})
 
 def loan_requests(request):
-    user_requests = UserRequest.objects.filter(tenant=request.user, is_approved=True, loan=True)
+    user_requests = UserRequest.objects.filter(tenant=request.user, is_approved=True, loan=True, loan_paid=False)
     if request.method == 'POST':
         request_id = request.POST.get('request_id')
         action = request.POST.get('action')
@@ -557,3 +573,50 @@ def loan_requests(request):
         elif action == 'cancel':
             user_request.delete()
     return render(request, 'loan_requests.html', {'user_requests': user_requests})
+
+def tenant_maintenance(request):
+    properties = RentalAgreement.objects.filter(tenant=request.user,
+                                                is_active=True)
+    if request.method == 'POST':
+        property_id = request.POST.get('property_id')
+        agreement = get_object_or_404(RentalAgreement, id=property_id)
+        description = request.POST.get('maintenance_request')
+        provider = agreement.property.provider
+        action = request.POST.get('action')
+        if action == 'request':
+            MaintenanceRequest.objects.create(agreement=agreement, description=description, status='pending', provider=provider)
+  
+    return render(request, 'tenant_maintenance.html', {'properties': properties})
+
+def provider_maintenance(request):
+    user_requests = MaintenanceRequest.objects.filter(provider=request.user)
+    if request.method == 'POST':
+        request_id = request.POST.get('request_id')
+        action_choice = request.POST.get('action_choice')
+        action = request.POST.get('action')
+        additional_info = request.POST.get('additional_info')
+        maintenance_request = get_object_or_404(MaintenanceRequest, id=request_id)
+
+        if action == 'ok':
+            if action_choice == 'in_progress':
+                maintenance_request.provider_comments = additional_info
+                maintenance_request.status = 'in_progress'
+                maintenance_request.resolved_date = None
+                maintenance_request.save()
+            elif action_choice == 'completed':
+                maintenance_request.provider_comments = additional_info
+                maintenance_request.status = 'completed'
+                maintenance_request.resolved_date = date.today()
+                maintenance_request.save()
+            elif action_choice == 'pending':
+                maintenance_request.provider_comments = additional_info
+                maintenance_request.status = 'pending'
+                maintenance_request.resolved_date = None
+                maintenance_request.save()
+
+    return render(request, 'provider_maintenance.html', {'user_requests': user_requests})
+
+def maintenance_status(request):
+    tenant = request.user
+    reports = MaintenanceRequest.objects.filter(agreement__tenant=tenant)
+    return render(request, 'maintenance_status.html', {'reports': reports})

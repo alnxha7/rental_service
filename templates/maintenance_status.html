@@ -1,0 +1,239 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Blockchain &mdash; using rental system</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="Free-Template.co" />
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,900|Oswald:300,400,700" rel="stylesheet">
+
+    <link rel="stylesheet" href="../static/fonts/icomoon/style.css">
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/css/jquery-ui.css">
+    <link rel="stylesheet" href="../static/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="../static/css/owl.theme.default.min.css">
+    <link rel="stylesheet" href="../static/css/owl.theme.default.min.css">
+    <link rel="stylesheet" href="../static/css/jquery.fancybox.min.css">
+    <link rel="stylesheet" href="../static/css/bootstrap-datepicker.css">
+    <link rel="stylesheet" href="../static/fonts/flaticon/font/flaticon.css">
+    <link rel="stylesheet" href="../static/css/aos.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+    <style>
+        .site-navbar {
+  position: fixed; /* Make the navbar fixed */
+  top: 0;
+  width: 100%;
+  z-index: 9999; /* Ensure it stays above other elements */
+  background-color: black; /* Ensure it has a background color */
+  transition: all 0.3s ease; /* Smooth transition for any effects */
+}
+
+.site-navbar.js-sticky-header {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow on scroll */
+}
+
+.table-container {
+  display: flex;
+  justify-content: center; /* Centers the table horizontally */
+  align-items: center; /* Centers the table vertically */
+  margin: 80px auto; /* Adds spacing above and below the table */
+}
+
+table {
+  width: 100%; /* Makes the table stretch to the full width of its container */
+  max-width: 1200px; /* Sets a maximum width for the table */
+  margin: 0 auto; /* Centers the table horizontally */
+  border-collapse: collapse;
+  text-align: center; /* Center-aligns table content */
+}
+
+/* Adjust Table Header */
+thead th {
+  background-color: #000001;
+  color: white;
+  padding: 16px; /* Increases padding for a larger feel */
+  text-align: center;
+  font-size: 1.2rem; /* Increases font size for headers */
+}
+
+/* Adjust Table Cells */
+td, th {
+  padding: 16px; /* Increases padding */
+  text-align: center;
+  color: #000001;
+}
+
+/* Increase Row Spacing */
+tbody tr {
+  border-bottom: 2px solid #ddd; /* Increases row border thickness */
+}
+
+/* Add Hover Effect */
+tbody tr:hover {
+  background-color: #eaeaea; /* Slightly darker on hover */
+}
+
+/* Responsive Adjustments */
+@media screen and (max-width: 600px) {
+  table {
+    font-size: 1.2rem; /* Slightly smaller font for smaller screens */
+  }
+}
+select[name="action_choice"] {
+  padding: 8px 12px; /* Adds inner spacing */
+  font-size: 1rem; /* Increases font size */
+  color: #333; /* Text color */
+  background-color: #f9f9f9; /* Light gray background */
+  border: 1px solid #ccc; /* Subtle border */
+  border-radius: 5px; /* Rounded corners */
+  outline: none; /* Removes blue border on focus */
+  transition: all 0.3s ease; /* Smooth transition for hover and focus effects */
+}
+
+select[name="action_choice"]:focus {
+  border-color: #007bff; /* Highlight border on focus */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Glow effect */
+}
+
+select[name="action_choice"]:hover {
+  background-color: #f1f1f1; /* Slightly darker background on hover */
+}
+    </style>
+    
+  </head>
+  <body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
+  
+  <div class="site-wrap">
+
+    <div class="site-mobile-menu site-navbar-target">
+      <div class="site-mobile-menu-header">
+        <div class="site-mobile-menu-close mt-3">
+          <span class="icon-close2 js-menu-toggle"></span>
+        </div>
+      </div>
+      <div class="site-mobile-menu-body"></div>
+    </div>
+   
+    
+    <header class="site-navbar py-4 js-sticky-header site-navbar-target" role="banner">
+
+      <div class="container">
+        <div class="row align-items-center">
+          
+          <div class="col-6 col-xl-2">
+            <h1 class="mb-0 site-logo m-0 p-0"><a href="/" class="mb-0">Welcome______{{ request.user.username }}</a></h1>
+          </div>
+
+          <div class="col-12 col-md-10 d-none d-xl-block">
+            <nav class="site-navigation position-relative text-right" role="navigation">
+
+                <ul class="site-menu main-menu js-clone-nav mr-auto d-none d-lg-block">
+                  <li><a href="{% url 'tenant_index' %}" class="nav-link">Home</a></li>
+                  <li><a href="{% url 'list_properties' %}" class="nav-link">Properties</a></li>
+                  <li><a href="{% url 'tenant_requests' %}" class="nav-link">My Requests</a></li>
+                  <li><a href="{% url 'payment_requests' %}" class="nav-link">Payment Requests</a></li>
+                  <li><a href="{% url 'monthly_payment' %}" class="nav-link">Monthly Payment</a></li>
+                  <li><a href="{% url 'logout' %}" class="nav-link">logout</a></li>
+                  </ul>
+            </nav>
+          </div>
+
+
+          <div class="col-6 d-inline-block d-xl-none ml-md-0 py-3"><a href="#" class="site-menu-toggle js-menu-toggle text-white float-right"><span class="icon-menu h3"></span></a></div>
+
+        </div>
+      </div>
+      
+    </header>
+
+
+        <div class="container">
+          <div class="row align-items-center justify-content-center">
+            <div class="col-md-6 mt-lg-5 text-center">
+
+                <div class="table-container">
+                    <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th>Property</th>
+                            <th>Provider</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Property</th>
+                            <th>Request Date</th>
+                            <th>Description</th>
+                            <th>Resolved Date</th>
+                            <th>Provider Comments</th>
+                            <th>ACTION</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for report in reports %}
+                          <tr>
+                            <td>{{ report.agreement.property.title }}</td>
+                            <td>{{ report.provider.username }}</td>
+                            <td>{{ report.agreement.start_date }}</td>
+                            <td>{{ report.agreement.end_date }}</td>
+                            <td>
+                              <img src="{{ report.agreement.property.image.url }}" alt="{{ property.provider.username }}" style="max-width: 100px; cursor: pointer;">
+                            </td>
+                            <td>{{ report.request_date }}</td>
+                            <td>{{ report.description }}</td>
+                            {% if report.resolved_date %}
+                                {% if report.status == 'completed' %}
+                                    <td style="color: rgb(42, 183, 42); font-size: 1.1rem; font-weight: bold;"> {{ report.resolved_date }} </td>
+                                {% endif %}
+                            {% else %}
+                              <td>Not Resolved........!!</td>
+                            {% endif %}
+                            {% if report.provider_comments %}
+                              <td> {{ report.provider_comments }} </td>
+                            {% else %}
+                              <td>no comments found.....!!!!1</td>
+                            {% endif %}
+                            <td>
+                            {% if report.status == 'completed' %}
+                                <span style="color: green;">Completed</span>
+                            {% elif report.status == 'in_progress' %}
+                                <span style="color: goldenrod;">In Progress</span>
+                            {% else %}
+                                <span style="color: red;">Pending</span>
+                            {% endif %}
+                            </td>
+                          </tr>
+                          {% empty %}
+                          <tr>
+                            <td colspan="9">No Request Available.</td>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>   
+  </div>      
+
+
+  <script src="../static/js/jquery-3.3.1.min.js"></script>
+  <script src="../static/js/jquery-ui.js"></script>
+  <script src="../static/js/popper.min.js"></script>
+  <script src="../static/js/bootstrap.min.js"></script>
+  <script src="../static/js/owl.carousel.min.js"></script>
+  <script src="../static/js/jquery.countdown.min.js"></script>
+  <script src="../static/js/bootstrap-datepicker.min.js"></script>
+  <script src="../static/js/jquery.easing.1.3.js"></script>
+  <script src="../static/js/aos.js"></script>
+  <script src="../static/js/jquery.fancybox.min.js"></script>
+  <script src="../static/js/jquery.sticky.js"></script>
+  <script src="../static/js/main.js"></script>
+    
+  </body>
+</html>

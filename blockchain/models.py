@@ -51,6 +51,7 @@ class UserRequest(models.Model):
     is_approved = models.BooleanField(default=False)
     monthly_rent = models.BooleanField(default=False)
     loan = models.BooleanField(default=False)
+    loan_paid = models.BooleanField(default=False)
 
     def calculate_end_date(self):
         """
@@ -108,3 +109,16 @@ class LoanPay(models.Model):
     due_date = models.DateField()
     amount = models.DecimalField(decimal_places=2, max_digits=10, default=0.00)
     is_paid = models.BooleanField(default=False)
+
+class MaintenanceRequest(models.Model):
+    agreement = models.ForeignKey(RentalAgreement, on_delete=models.CASCADE)
+    provider = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'provider'})
+    description = models.TextField()
+    request_date = models.DateField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=[('pending', 'Pending'), ('in_progress', 'In Progress'), ('completed', 'Completed')])
+    resolved_date = models.DateField(null=True, blank=True)
+    provider_comments = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Maintenance request for {self.agreement.property.title} - {self.status}"
+

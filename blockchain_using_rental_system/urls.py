@@ -54,6 +54,10 @@ urlpatterns = [
     path('monthly_requests/', views.monthly_request, name='monthly_requests'),
     path('loan_requests/', views.loan_requests, name='loan_requests'),
 
+    path('tenant_maintenance/', views.tenant_maintenance, name='tenant_maintenance'),
+    path('provider_maintenance/', views.provider_maintenance, name='provider_maintenance'),
+    path('maintenance_status/', views.maintenance_status, name='maintenance_status'),
+
 ]
 
 if settings.DEBUG:

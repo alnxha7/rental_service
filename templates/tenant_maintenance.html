@@ -1,0 +1,202 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Blockchain &mdash; using rental system</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="Free-Template.co" />
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,900|Oswald:300,400,700" rel="stylesheet">
+
+    <link rel="stylesheet" href="../static/fonts/icomoon/style.css">
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/css/jquery-ui.css">
+    <link rel="stylesheet" href="../static/css/owl.carousel.min.css">
+    <link rel="stylesheet" href="../static/css/owl.theme.default.min.css">
+    <link rel="stylesheet" href="../static/css/owl.theme.default.min.css">
+    <link rel="stylesheet" href="../static/css/jquery.fancybox.min.css">
+    <link rel="stylesheet" href="../static/css/bootstrap-datepicker.css">
+    <link rel="stylesheet" href="../static/fonts/flaticon/font/flaticon.css">
+    <link rel="stylesheet" href="../static/css/aos.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+    <style>
+        .site-navbar {
+  position: fixed; /* Make the navbar fixed */
+  top: 0;
+  width: 100%;
+  z-index: 9999; /* Ensure it stays above other elements */
+  background-color: black; /* Ensure it has a background color */
+  transition: all 0.3s ease; /* Smooth transition for any effects */
+}
+
+.site-navbar.js-sticky-header {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow on scroll */
+}
+      table {
+  width: 100%; /* Ensures it stretches to the full width of the container */
+  max-width: 1200px; /* Increases the maximum width */
+  border-collapse: collapse;
+  margin: 30px auto; /* Centers the table and adds more spacing */
+  font-size: 1.1rem; /* Makes the text slightly larger */
+  text-align: left;
+}
+
+/* Adjust Table Header */
+thead th {
+  background-color: #000001;
+  color: white;
+  padding: 16px; /* Increases padding for a larger feel */
+  text-align: center;
+  font-size: 1.2rem; /* Increases font size for headers */
+}
+
+/* Adjust Table Cells */
+td, th {
+  padding: 16px; /* Increases padding */
+  text-align: center;
+  color: #000001;
+}
+
+/* Increase Row Spacing */
+tbody tr {
+  border-bottom: 2px solid #ddd; /* Increases row border thickness */
+}
+
+/* Add Hover Effect */
+tbody tr:hover {
+  background-color: #eaeaea; /* Slightly darker on hover */
+}
+
+/* Responsive Adjustments */
+@media screen and (max-width: 600px) {
+  table {
+    font-size: 1rem; /* Slightly smaller font for smaller screens */
+  }
+}
+    </style>
+    
+  </head>
+  <body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
+  
+  <div class="site-wrap">
+
+    <div class="site-mobile-menu site-navbar-target">
+      <div class="site-mobile-menu-header">
+        <div class="site-mobile-menu-close mt-3">
+          <span class="icon-close2 js-menu-toggle"></span>
+        </div>
+      </div>
+      <div class="site-mobile-menu-body"></div>
+    </div>
+   
+    
+    <header class="site-navbar py-4 js-sticky-header site-navbar-target" role="banner">
+
+      <div class="container">
+        <div class="row align-items-center">
+          
+          <div class="col-6 col-xl-2">
+            <h1 class="mb-0 site-logo m-0 p-0"><a href="/" class="mb-0">Welcome______{{ request.user.username }}</a></h1>
+          </div>
+
+          <div class="col-12 col-md-10 d-none d-xl-block">
+            <nav class="site-navigation position-relative text-right" role="navigation">
+
+                <ul class="site-menu main-menu js-clone-nav mr-auto d-none d-lg-block">
+                  <li><a href="{% url 'tenant_index' %}" class="nav-link">Home</a></li>
+                  <li><a href="{% url 'list_properties' %}" class="nav-link">Properties</a></li>
+                  <li><a href="{% url 'tenant_requests' %}" class="nav-link">My Requests</a></li>
+                  <li><a href="{% url 'payment_requests' %}" class="nav-link">Payment Requests</a></li>
+                  <li><a href="{% url 'monthly_payment' %}" class="nav-link">Monthly Payment</a></li>
+                  <li><a href="{% url 'logout' %}" class="nav-link">logout</a></li>
+                  </ul>
+            </nav>
+          </div>
+
+
+          <div class="col-6 d-inline-block d-xl-none ml-md-0 py-3"><a href="#" class="site-menu-toggle js-menu-toggle text-white float-right"><span class="icon-menu h3"></span></a></div>
+
+        </div>
+      </div>
+      
+    </header>
+
+
+        <div class="container">
+          <div class="row align-items-center justify-content-center">
+            <div class="col-md-6 mt-lg-5 text-center">
+
+                <h2 class="text-white">My Requests</h2>
+          <table class="table table-bordered table-bordered">
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>Provider</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Property</th>
+                <th>ACTION</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for property in properties %}
+              <tr>
+                <td>{{ property.property.title }}</td>
+                <td>{{ property.property.provider.username }}</td>
+                <td>{{ property.start_date }}</td>
+                <td>{{ property.end_date }}</td>
+                <td>
+                  <img src="{{ property.property.image.url }}" alt="{{ property.provider.username }}" style="max-width: 100px; cursor: pointer;">
+                </td>   
+                <td>
+                    <form method="post" style="display:inline;" action="{% url 'tenant_maintenance' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="property_id" value="{{ property.id }}">
+                        <textarea 
+                            name="maintenance_request" 
+                            placeholder="Describe the issue here" 
+                            rows="2" 
+                            cols="20" 
+                            style="margin-bottom: 10px;" 
+                            required></textarea>
+                        <br>
+                        <button class="btn btn-warning" type="submit" name="action" value="request">
+                            Request for Maintenance
+                        </button>
+                    </form>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="5">No Request Available.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+            </div>
+          </div>
+        </div>
+      </div>   
+  </div>      
+
+
+  <script src="../static/js/jquery-3.3.1.min.js"></script>
+  <script src="../static/js/jquery-ui.js"></script>
+  <script src="../static/js/popper.min.js"></script>
+  <script src="../static/js/bootstrap.min.js"></script>
+  <script src="../static/js/owl.carousel.min.js"></script>
+  <script src="../static/js/jquery.countdown.min.js"></script>
+  <script src="../static/js/bootstrap-datepicker.min.js"></script>
+  <script src="../static/js/jquery.easing.1.3.js"></script>
+  <script src="../static/js/aos.js"></script>
+  <script src="../static/js/jquery.fancybox.min.js"></script>
+  <script src="../static/js/jquery.sticky.js"></script>
+  <script src="../static/js/main.js"></script>
+    
+  </body>
+</html>
