@@ -107,12 +107,17 @@ tbody tr:hover {
             <nav class="site-navigation position-relative text-right" role="navigation">
 
                 <ul class="site-menu main-menu js-clone-nav mr-auto d-none d-lg-block">
-                  <li><a href="{% url 'tenant_index' %}" class="nav-link">Home</a></li>
-                  <li><a href="{% url 'list_properties' %}" class="nav-link">Properties</a></li>
-                  <li><a href="{% url 'tenant_requests' %}" class="nav-link">My Requests</a></li>
-                  <li><a href="{% url 'payment_requests' %}" class="nav-link">Payment Requests</a></li>
-                  <li><a href="{% url 'monthly_payment' %}" class="nav-link">Monthly Payment</a></li>
-                  <li><a href="{% url 'logout' %}" class="nav-link">logout</a></li>
+                    <li><a href="{% url 'tenant_index' %}" class="nav-link">Home</a></li>
+                    <li><a href="{% url 'list_properties' %}" class="nav-link">Properties</a></li>
+                    <li><a href="{% url 'tenant_requests' %}" class="nav-link">My Requests</a></li>
+                    <li><a href="{% url 'payment_requests' %}" class="nav-link">Payment Requests</a></li>
+                    <li><a href="{% url 'monthly_payment' %}" class="nav-link">Monthly Payment</a></li>
+                    <li><a href="{% url 'monthly_requests' %}" class="nav-link">Monthly Requests</a></li>
+                    <li><a href="{% url 'loan_requests' %}" class="nav-link">Loan Requests</a></li>
+                    <li><a href="{% url 'tenant_maintenance' %}" class="nav-link">Report Maintenance</a></li>
+                    <li><a href="{% url 'maintenance_status' %}" class="nav-link">Maintenance Status</a></li>
+                    <li><a href="{% url 'tenant_history' %}" class="nav-link">My Bookings</a></li>
+                    <li><a href="{% url 'logout' %}" class="nav-link">logout</a></li>
                   </ul>
             </nav>
           </div>
