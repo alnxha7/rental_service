@@ -164,25 +164,37 @@ select[name="action_choice"]:hover {
                 <thead>
                   <tr>
                     <th>Property</th>
-                    <th>Provider</th>
+                    <th>Tenant</th>
                     <th>Start Date</th>
                     <th>End Date</th>
                     <th>Property</th>
+                    <th>Amount</th>
+                    <th>Remaining Amount</th>
+                    <th>Payment Date</th>
                     <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for history in histories %}
                   <tr>
-                    <td>{{ history.property.title }}</td>
-                    <td>{{ history.property.provider.username }}</td>
-                    <td>{{ history.start_date }}</td>
-                    <td>{{ history.end_date }}</td>
+                    <td>{{ history.agreement.property.title }}</td>
+                    <td>{{ history.agreement.tenant.username }}</td>
+                    <td>{{ history.agreement.start_date }}</td>
+                    <td>{{ history.agreement.end_date }}</td>
                     <td>
-                      <img src="{{ history.property.image.url }}" alt="{{ property.provider.username }}" style="max-width: 100px; cursor: pointer;">
-                    </td>   
+                      <img src="{{ history.agreement.property.image.url }}" alt="{{ property.provider.username }}" style="max-width: 100px; cursor: pointer;">
+                    </td> 
+                    <td> {{ history.amount }} </td>
+                    <td> 
+                      {% if history.status == 'Paid' %}
+                        <span style="color: rgb(37, 165, 37);">Paid</span>
+                      {% else %}
+                        <span style="color: red;">Pending</span>
+                      {% endif %}
+                     </td>
+                    <td> {{ history.payment_date }} </td>  
                     <td>
-                        {% if history.is_active %}
+                        {% if history.agreement.is_active %}
                             <span style="color: rgb(37, 165, 37);">ACTIVE</span>
                         {% else %}
                             <span style="color: red;">INACTIVE</span>

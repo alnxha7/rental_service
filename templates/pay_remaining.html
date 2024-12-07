@@ -24,6 +24,12 @@
     <link rel="stylesheet" href="../static/css/aos.css">
     <link rel="stylesheet" href="../static/css/style.css">
     <style>
+        .table-container {
+  display: flex;
+  justify-content: center; /* Centers the table horizontally */
+  align-items: center; /* Centers the table vertically */
+  margin: 80px auto; /* Adds spacing above and below the table */
+}
       table {
   width: 100%; /* Ensures it stretches to the full width of the container */
   max-width: 1200px; /* Increases the maximum width */
@@ -136,45 +142,64 @@ tbody tr:hover {
           <div class="row align-items-center justify-content-center">
             <div class="col-md-6 mt-lg-5 text-center">
 
-                <h2 class="text-white">My Requests</h2>
-          <table class="table table-bordered table-light">
-            <thead>
-              <tr>
-                <th>Property</th>
-                <th>Provider</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Rental Period</th>
-                <th>Property Image</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for user_request in user_requests %}
-              <tr>
-                <td>{{ user_request.property.title }}</td>
-                <td>{{ user_request.property.provider.username }}</td>
-                <td>{{ user_request.start_date }}</td>
-                <td>{{ user_request.end_date }}</td>
-                <td>{{ user_request.duration }} - {{ request.rental_period }}</td>
-                <td>
-                  <img src="{{ user_request.property.image.url }}" alt="{{ property.provider.username }}" style="max-width: 100px; cursor: pointer;">
-                </td>    
-                <td>
-                  {% if user_request.is_approved %}
-                    <span style="color: rgb(49, 163, 49);">Approved</span>
-                  {% else %}
-                    <span style="color: rgb(255, 255, 0);">Pending</span>
-                  {% endif %}
-                </td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="5">No Request Available.</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+                <div class="table-container">
+                    <table class="table table-bordered table-light">
+                        <thead>
+                          <tr>
+                            <th>Property</th>
+                            <th>Provider</th>
+                            <th>Property Image</th>
+                            <th>Date Purchased</th>
+                            <th>Due Date</th>
+                            <th>Total Amount</th>
+                            <th>Status</th>
+                            <th>Remaining Amount</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for pay in payments %}
+                          <tr>
+                            <td>{{ pay.agreement.property.title }}</td>
+                            <td>{{ pay.agreement.property.provider.username }}</td>
+                            <td>
+                              <img src="{{ pay.agreement.property.image.url }}" alt="{{ property.provider.username }}" style="max-width: 100px; cursor: pointer;">
+                            </td>  
+                            <td>{{ pay.agreement.start_date }}</td>
+                            <td>{{ pay.due_date }}</td>  
+                            <td>{{ pay.amount }}</td>
+                            <td>
+                                {% if pay.status == "Pending" %}
+                                    <span style="color: red;">Pending</span>
+                                {% else %}
+                                    <span style="color: green;">Paid</span>
+                                {% endif %}
+                            </td>  
+                            <td>
+                                {{ pay.remaining_amount }}
+                            </td>
+                            <td>
+                                {% if not pay.status == 'Paid' %}
+                                <form method="post" style="display:inline;" action="{% url 'pay_remaining' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="payment_id" value="{{ pay.id }}">
+                                    <button class="btn btn-success" type="submit" name="action" value="pay">Pay Now</button>
+                                </form>
+            
+                                {% else %}
+                                    <span class="btn btn-warning">No Action</span>
+                            {% endif %}
+                          </td>
+                          </tr>
+                          {% empty %}
+                          <tr>
+                            <td colspan="5">No Request Available.</td>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+
+                </div>
 
             </div>
           </div>

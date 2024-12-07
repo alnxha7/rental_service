@@ -158,6 +158,8 @@ button.btn-danger:hover {
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone</th>
+                <th>Address</th>
+                <th>Aadhaar</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -167,11 +169,14 @@ button.btn-danger:hover {
                 <td>{{ provider.username }}</td>
                 <td>{{ provider.email }}</td>
                 <td>{{ provider.contact_number }}</td>
+                <td> {{ provider.address }} </td>
+                <td><img src="{{ provider.document.url }}" alt="Aadhaar Document" style="max-width: 100px; cursor: pointer;"></td>
                 <td>
                     <form method="post" style="display:inline;">
                       {% csrf_token %}
                       <input type="hidden" name="user_id" value="{{ provider.id }}">
                       <button class="btn btn-success" type="submit" name="action" value="approve">Approve</button>
+                      <button class="btn btn-danger" type="submit" name="action" value="remove">Remove</button>
                     </form>
                   </td>
               </tr>
@@ -191,6 +196,8 @@ button.btn-danger:hover {
                 <th>Name</th>
                 <th>Email</th>
                 <th>Phone</th>
+                <th>Address</th>
+                <th>Aadhaar</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -200,11 +207,14 @@ button.btn-danger:hover {
                 <td>{{ tenant.username }}</td>
                 <td>{{ tenant.email }}</td>
                 <td>{{ tenant.contact_number }}</td>
+                <td> {{ tenant.address }} </td>
+                <td><img src="{{ tenant.document.url }}" alt="Aadhaar Document" style="max-width: 100px; cursor: pointer;"></td>
                 <td>
                     <form method="post" style="display:inline;">
                       {% csrf_token %}
                       <input type="hidden" name="user_id" value="{{ tenant.id }}">
-                      <button class="btn btn-success" type="submit" name="action" value="approve">Approve</button>
+                      <button class="btn btn-success" type="submit" name="action" value="approve">Approve</button><br>
+                      <button class="btn btn-danger" type="submit" name="action" value="remove">Remove</button>
                     </form>
                   </td>
               </tr>

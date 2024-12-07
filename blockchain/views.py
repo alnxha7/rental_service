@@ -127,6 +127,8 @@ def admin_approval(request):
         if action == "approve":
             user.verification_status = True
             user.save()
+        elif action == "remove":
+            user.delete()
         return redirect("admin_approval")  
     
     return render(request, 'admin_approval.html', {'providers': providers, 'tenants': tenants})
@@ -626,5 +628,44 @@ def tenant_history(request):
     return render(request, 'tenant_history.html', {'histories': histories})
 
 def provider_history(request):
-    histories = RentalAgreement.objects.filter(property__provider=request.user)
+    histories = Payment.objects.filter(agreement__property__provider=request.user)
     return render(request, 'provider_history.html', {'histories': histories})
+
+def pay_remaining(request):
+    payments = Payment.objects.filter(agreement__tenant=request.user)
+    for payment in payments:
+        payment.remaining_amount = (payment.amount) - (payment.agreement.property.rent_amount * Decimal('0.3'))
+
+    if request.method == 'POST':
+        payment_id = request.POST.get('payment_id')
+        action = request.POST.get('action')
+
+        if action == 'pay':
+            return redirect('remaining_payment', payment_id=payment_id)
+    return render(request, 'pay_remaining.html', {'payments': payments})
+
+def remaning_payment(request, payment_id):
+    payment = get_object_or_404(Payment, id=payment_id)
+    payment.remaining_amount = (payment.amount) - (payment.agreement.property.rent_amount * Decimal('0.3'))
+
+    if request.method == 'POST':
+        tenant_name = request.user.username
+        provider_name = payment.agreement.property.provider.username
+        property = payment.agreement.property
+        amount = payment.remaining_amount
+        end_date = payment.agreement.end_date
+        payment_date = date.today()
+
+        payment.status = "Paid"
+        payment.save()
+
+        context = {'tenant_name': tenant_name,
+                   'provider_name': provider_name,
+                   'property': property, 
+                   'amount': amount,
+                   'end_date': end_date, 
+                   'payment_date': payment_date}
+        
+        return render(request, 'payment_success.html', context)
+    return render(request, 'remaining_payment.html', {'payment': payment})
+

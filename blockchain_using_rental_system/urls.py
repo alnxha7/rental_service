@@ -44,11 +44,13 @@ urlpatterns = [
     path('user_requests/', views.user_requests, name='user_requests'),
 
     path('payment_requests/', views.payment_requests, name='payment_requests'),
+    path('remaining_payment/<int:payment_id>', views.remaning_payment, name='remaining_payment'),
     path('deposit_form/<int:request_id>/', views.deposit_form, name='deposit_form'),
     path('payment_success/', views.payment_success, name='payment_success'),
     path('monthly_payment/', views.monthly_payment, name='monthly_payment'),
-    path('pay_monthly/<int:request_id>', views.pay_monthly, name='pay_monthly'),
+    path('pay_monthly/<int:request_id>/', views.pay_monthly, name='pay_monthly'),
 
+    path('pay_remaining/', views.pay_remaining, name='pay_remaining'),
     path('provider_monthly/', views.provider_monthly, name='provider_monthly'),
     path('provider_loan/', views.provider_loan, name='provider_loan'),
     path('monthly_requests/', views.monthly_request, name='monthly_requests'),
